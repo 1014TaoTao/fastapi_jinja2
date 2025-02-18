@@ -1,0 +1,132 @@
+body {  
+    margin: 0;
+    background-image: url('/static/background.png');
+
+}
+
+/* 整体布局容器 */
+.layout-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* 左侧导航栏 */
+.sidebar {
+    padding: 20px;
+    width: 250px;
+    background-color: #343a40;
+    color: #fff;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    border: 2px solid red; /* 调试用 */
+}
+
+/* Logo 和项目名称 */
+.nav-logo {
+    height: 60px; /* 与 header 的高度一致 */
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    border-bottom: 1px solid #495057; /* 添加分隔线 */
+    color: hsl(0, 0%, 100%);
+}
+
+
+.sidebar .nav-link {
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+}
+
+
+.sidebar .nav-link.active, .sidebar .nav-link:hover {
+    background-color: #495057;
+}
+
+/* 右侧主内容区 */
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* 头部 */
+header {
+    background-color: #343a40;
+    padding: 0 20px; /* 调整内边距 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px; /* 固定高度 */
+    border: 2px solid green; /* 调试用 */
+}
+
+/* 退出登录按钮容器 */
+.logout-button-container {
+    margin-left: auto;
+}
+
+/* 退出登录按钮 */
+.logout-button {
+    background-color: #dc3545;
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px 15px;
+    text-align: center;
+    transition: background-color 0.3s;
+    text-decoration: none;
+}
+
+.logout-button:hover {
+    background-color: #c3303f;
+}
+
+/* 面包屑 */
+.breadcrumb {
+    background-color: #e9ecef;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 20px;
+    border: 2px solid blue; /* 调试用 */
+}
+
+.breadcrumb-item a {
+    color: #343a40;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    color: blue;
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
+}
+
+/* 内容区 */
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #fff;
+    margin: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid #343a40; /* 调试用 */
+}
+
+/* 底部 */
+footer {
+    padding: 10px;
+    background-color: #343a40;
+    color: #fff;
+    text-align: center;
+    flex-shrink: 0;
+    border: 2px solid yellow; /* 调试用 */
+}

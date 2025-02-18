@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Web Application{% endblock %}
+
+{% block body %}
+    <!-- 整体布局容器 -->
+    <div class="layout-container">
+        <!-- 左侧导航栏 -->
+        <nav class="sidebar">
+            <!-- Logo 和项目名称 -->
+            <div class="nav-logo">
+                <img src="{{ url_for('static', path='/fastapi-logo.svg') }}" alt="Logo" height="40"
+                    class="d-inline-block align-top me-2">
+            </div>
+            <div class="position-sticky pt-2 sidebar-sticky">
+                <!-- 导航项 -->
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chat">模型对话</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">关于我们</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- 右侧主内容区 -->
+        <main class="main-content">
+            <!-- 头部 -->
+            <header>
+                <!-- 退出登录按钮 -->
+                <div class="logout-button-container">
+                    <a class="logout-button" href="/">
+                        退出登录
+                    </a>
+                </div>
+            </header>
+
+            <!-- 面包屑 -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/home">首页</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">{% block breadcrumb %}{% endblock %}</li>
+                </ol>
+            </nav>
+
+            <!-- 内容区 -->
+            <div class="content">
+                {% block content %}
+                {% endblock %}
+            </div>
+
+            <!-- 底部 -->
+            <footer>
+                <p>&copy; 2023 FastApi Project. 保留所有权利。</p>
+            </footer>
+        </main>
+    </div>
+{% endblock %}
