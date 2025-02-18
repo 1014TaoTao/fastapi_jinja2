@@ -18,16 +18,6 @@ class Settings(BaseSettings):
     # sqlite 数据库名称
     SQLITE_DB_NAME: str
 
-    # deepseek api 文档地址： https://api-docs.deepseek.com/zh-cn/
-    DEEPSEEK_BASE_URL: str = "https://api.deepseek.com"
-    DEEPSEEK_API_KEY: str
-    DEEPSEEK_MODEL: str = "deepseek-chat"
-
-    # qwen api 文档地址： https://help.aliyun.com/zh/model-studio/getting-started/
-    QWEN_BASE_URL: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
-    QWEN_API_KEY: str
-    QWEN_MODEL: str = "qwen-plus"
-
     @property
     def DATABASE_URL(self) -> str:
         """数据库连接地址"""

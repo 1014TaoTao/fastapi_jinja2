@@ -17,7 +17,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[Any, Any]:
     自定义生命周期
     """
     logger.info(f'服务启动...')
-
     # from sqlmodel import SQLModel, Session
     # from app.core.database import engine
     # from app.model.demo import User
@@ -25,12 +24,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[Any, Any]:
     # SQLModel.metadata.create_all(engine)
     # # 使用 get_db() 来获取会话管理器
     # with Session(engine) as session:
-    #     admin = User(name="admin", password="123456", description="管理员", is_active=True, is_superuser=True)
+    #     admin = User(name="admin", password="123456", description="管理员", is_superuser=True)
     #     session.add(admin)
     #     session.commit()
+    #     session.close()
     # logger.info(f'数据库初始化...')
     yield
     logger.info(f'服务关闭...')
+
 
 def create_app() -> FastAPI:
 
