@@ -73,15 +73,11 @@ fastapi_jinja2
   - cd fastapi_jinja2
   - pip install -r requirements.txt
 
-- 3、安装依赖
-
-  - pip install -r requirements.txt
-
-- 4、启动项目：
+- 3、启动项目：
 
   - python3 main.py
 
-- 5、访问项目：
+- 4、访问项目：
   
   - 前端地址：<http://0.0.0.0:8000/)>
   - 账号：`admin` 密码：`123456`
