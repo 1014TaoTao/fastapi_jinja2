@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from fastapi import FastAPI, Request, logger, status, HTTPException
+from fastapi import FastAPI, Request, logger, status, HTTPException, templating
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from starlette.responses import JSONResponse
-from starlette.exceptions import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.logger import logger
@@ -39,3 +38,13 @@ def register_exception_handler(app: FastAPI) -> None:
         """值异常处理器"""
         logger.error(f"请求地址: {request.url}, 错误详情: {exc}")
         return JSONResponse(status_code=status.HTTP_502_BAD_GATEWAY, content=str(exc))
+
+    templates = templating.Jinja2Templates(directory="templates")
+
+    @app.exception_handler(404)
+    async def not_found_exception_handler(request: Request, exc):
+        return templates.TemplateResponse("404.html", {"request": request})
+    
+    @app.exception_handler(500)
+    async def server_error_exception_handler(request: Request, exc):
+        return templates.TemplateResponse("500.html", {"request": request})

@@ -6,164 +6,169 @@
 {% block content %}
     <section class="card mb-4">
         <div class="card-body">
-            <h2 class="card-title">用户列表</h2>
-            <div class="mb-3">
-                <form class="form-inline float-right" method="get" action="/user/page">
-                    <div class="form-group mb-2">
-                        <input type="text" name="filters" class="form-control mr-2" placeholder="用户名">
+            <!-- 标题 -->
+            <h2 class="card-title mb-4">用户列表</h2>
+            
+            <!-- 查询表单 -->
+            <div class="d-flex align-items-center mb-3">
+                <form class="d-flex align-items-center" method="get" action="/users">
+                    <div class="form-group mr-2 mb-0"> <!-- 使用 mb-0 去除默认的 margin-bottom -->
+                        <input type="text" name="name" class="form-control" placeholder="用户名" value="{{ request.query_params.get('name', '') }}" style="width: 200px;"> <!-- 调整输入框宽度 -->
                     </div>
-                    <button type="submit" class="btn btn-secondary mb-2">查询</button>
+                    <button type="submit" class="btn btn-secondary">查询</button>
                 </form>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addUserModal">新增用户</button>
             </div>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>用户名</th>
-                        <th>密码</th>
-                        <th>超级管理员</th>
-                        <th>描述</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                    <tr>
-                        <td>{{ user.id }}</td>
-                        <td>{{ user.name }}</td>
-                        <td>{{ user.password }}</td>
-                        <td>{{ '是' if user.is_superuser else '否' }}</td>
-                        <td>{{ user.description }}</td>
-                        <td>
-                            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailUserModal{{ user.id }}">详情</button>
-                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editUserModal{{ user.id }}">修改</button>
-                            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteUserModal{{ user.id }}">删除</button>
-                        </td>
-                    </tr>
-                    <!-- 详情模态框 -->
-                    <div class="modal fade" id="detailUserModal{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="detailUserModalLabel{{ user.id }}" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="detailUserModalLabel{{ user.id }}">用户详情</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <p><strong>ID:</strong> {{ user.id }}</p>
-                                    <p><strong>用户名:</strong> {{ user.name }}</p>
-                                    <p><strong>密码:</strong> {{ user.password }}</p>
-                                    <p><strong>超级管理员:</strong> {{ '是' if user.is_superuser else '否' }}</p>
-                                    <p><strong>描述:</strong> {{ user.description }}</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 编辑模态框 -->
-                    <div class="modal fade" id="editUserModal{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel{{ user.id }}" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="editUserModalLabel{{ user.id }}">编辑用户</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <form action="/user/update/{{ user.id }}" method="post">
-                                        <div class="form-group">
-                                            <label for="name{{ user.id }}">用户名</label>
-                                            <input type="text" class="form-control" id="name{{ user.id }}" name="name" value="{{ user.name }}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="password{{ user.id }}">密码</label>
-                                            <input type="password" class="form-control" id="password{{ user.id }}" name="password" value="{{ user.password }}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="is_superuser{{ user.id }}">超级管理员</label>
-                                            <select class="form-control" id="is_superuser{{ user.id }}" name="is_superuser">
-                                                <option value="1" {% if user.is_superuser %}selected{% endif %}>是</option>
-                                                <option value="0" {% if not user.is_superuser %}selected{% endif %}>否</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="description{{ user.id }}">描述</label>
-                                            <textarea class="form-control" id="description{{ user.id }}" name="description">{{ user.description }}</textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary">保存</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 删除模态框 -->
-                    <div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalLabel{{ user.id }}" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="deleteUserModalLabel{{ user.id }}">删除用户</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    确定要删除用户 "{{ user.name }}" 吗？
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                                    <form action="/user/delete/{{ user.id }}" method="post">
-                                        <button type="submit" class="btn btn-danger">删除</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+            <!-- 重置查询和新增用户按钮 -->
+            <div class="mb-4">
+                <a href="/users" class="btn btn-secondary mr-2">重置查询</a>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">新增用户</button>
+            </div>
+            
+            <!-- 用户列表表格 -->
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>密码</th>
+                            <th>超级管理员</th>
+                            <th>描述</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.password }}</td> <!-- 不显示密码 -->
+                            <td>{{ '是' if user.is_superuser else '否' }}</td>
+                            <td>{{ user.description }}</td>
+                            <td>
+                                <button type="button" class="btn btn-info btn-sm mr-1" data-bs-toggle="modal" data-bs-target="#detailUserModal{{ user.id }}">详情</button>
+                                <button type="button" class="btn btn-warning btn-sm mr-1" data-bs-toggle="modal" data-bs-target="#editUserModal{{ user.id }}">修改</button>
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.id }}">删除</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </section>
 
     <!-- 新增用户模态框 -->
-    <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addUserModalLabel">新增用户</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="/user/create" method="post">
-                        <div class="form-group">
-                            <label for="name">用户名</label>
-                            <input type="text" class="form-control" id="name" name="name">
+                    <!-- 表单 -->
+                    <form id="addUserForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">用户名</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="请输入用户名" required>
                         </div>
-                        <div class="form-group">
-                            <label for="password">密码</label>
-                            <input type="password" class="form-control" id="password" name="password">
+                        <div class="mb-3">
+                            <label for="password" class="form-label">密码</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码" required>
                         </div>
-                        <div class="form-group">
-                            <label for="is_superuser">超级管理员</label>
-                            <select class="form-control" id="is_superuser" name="is_superuser">
-                                <option value="1">是</option>
-                                <option value="0">否</option>
-                            </select>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">描述</label>
+                            <textarea class="form-control" id="description" name="description" placeholder="请输入描述" rows="3"></textarea>
                         </div>
-                        <div class="form-group">
-                            <label for="description">描述</label>
-                            <textarea class="form-control" id="description" name="description"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">保存</button>
                     </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" form="addUserForm" class="btn btn-primary">确认</button>
                 </div>
             </div>
         </div>
     </div>
+
+
+    {% for user in users %}
+        <!-- 删除确认模态框 -->
+        <div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1" aria-labelledby="deleteUserModalLabel{{ user.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteUserModalLabel{{ user.id }}">删除用户</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        确定要删除用户 <strong>{{ user.name }}</strong> 吗？
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <form action="/delete_user/{{ user.id }}" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-danger">确认删除</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户详情模态框 -->
+        <div class="modal fade" id="detailUserModal{{ user.id }}" tabindex="-1" aria-labelledby="detailUserModalLabel{{ user.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailUserModalLabel{{ user.id }}">用户详情</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>用户名:</strong> {{ user.name }}</p>
+                        <p><strong>密码:</strong> {{ user.password }}</p>
+                        <p><strong>超级管理员:</strong> {{ '是' if user.is_superuser else '否' }}</p>
+                        <p><strong>描述:</strong> {{ user.description }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编辑用户模态框 -->
+        <div class="modal fade" id="editUserModal{{ user.id }}" tabindex="-1" aria-labelledby="editUserModalLabel{{ user.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editUserModalLabel{{ user.id }}">编辑用户</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editUserForm{{ user.id }}">
+                            <input type="hidden" name="id" value="{{ user.id }}">
+                            <div class="mb-3">
+                                <label for="username{{ user.id }}" class="form-label">用户名</label>
+                                <input type="text" class="form-control" id="username{{ user.id }}" name="username" placeholder="请输入用户名" value="{{ user.name }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password{{ user.id }}" class="form-label">密码</label>
+                                <input type="password" class="form-control" id="password{{ user.id }}" name="password" placeholder="请输入密码" value="{{ user.password }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="description{{ user.id }}" class="form-label">描述</label>
+                                <textarea class="form-control" id="description{{ user.id }}" name="description" rows="3">{{ user.description }} </textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" form="editUserForm{{ user.id }}" class="btn btn-primary">确认</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    
+
 {% endblock %}

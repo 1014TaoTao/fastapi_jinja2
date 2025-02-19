@@ -66,7 +66,7 @@ class RequestLogMiddleware(BaseHTTPMiddleware):
         
         except Exception as e:
             logger.error(f"系统异常: {str(e)}")
-            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"系统异常，请联系管理员: {str(e)}")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"系统异常，请联系管理员: {str(e)}")
 
 def register_middleware_handler(app: FastAPI) -> None:
     app.add_middleware(CORSMiddleware)

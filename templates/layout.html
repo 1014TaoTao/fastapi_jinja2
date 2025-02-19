@@ -4,58 +4,98 @@
 
 {% block body %}
     <!-- 整体布局容器 -->
-    <div class="layout-container">
-        <!-- 左侧导航栏 -->
-        <nav class="sidebar">
-            <!-- Logo 和项目名称 -->
-            <div class="nav-logo">
-                <img src="{{ url_for('static', path='/fastapi-logo.svg') }}" alt="Logo" height="40"
-                    class="d-inline-block align-top me-2">
-            </div>
-            <div class="position-sticky pt-2 sidebar-sticky">
-                <!-- 导航项 -->
-                <ul class="nav flex-column">
-                    {% for link in nav_links %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ link.url }}">{{ link.name }}</a>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </nav>
-
-        <!-- 右侧主内容区 -->
-        <main class="main-content">
-            <!-- 头部 -->
-            <header>
-                <!-- 退出登录按钮 -->
-                <div class="logout-button-container">
-                    <a class="logout-button" href="/">
-                        退出登录
+    <div class="container-fluid vh-100 g-0">
+        <div class="row g-0 h-100">
+            <!-- 左侧导航栏 -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse h-100">
+                <!-- Logo 和项目名称 -->
+                <div class="d-flex align-items-center justify-content-center p-3">
+                    <a href="/home">
+                        <img src="{{ url_for('static', path='/fastapi-logo.svg') }}" alt="Logo" height="35" class="d-inline-block align-top me-2">
                     </a>
+                    
                 </div>
-            </header>
-
-            <!-- 面包屑 -->
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="/home">首页</a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">{% block breadcrumb %}{% endblock %}</li>
-                </ol>
+                <div class="position-sticky pt-2 sidebar-sticky">
+                    <!-- 导航项 -->
+                    <ul class="nav flex-column" style="padding-left: 60px;">
+                        <li class="nav-item ">
+                            <a class="nav-link" href="/home" style="color: #009485;">
+                                <i class="bi bi-house-door me-2" style="font-size: 1.2em;"></i> 首页
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/users" style="color: #009485;">
+                                <i class="bi bi-people me-2" style="font-size: 1.2em;"></i> 用户管理
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </nav>
 
-            <!-- 内容区 -->
-            <div class="content">
-                {% block content %}
-                {% endblock %}
-            </div>
+            <!-- 右侧主内容区 -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 h-100 d-flex flex-column">
+                <!-- 头部 -->
+                <header class="navbar navbar-expand-lg navbar-light" style="background-color: #009485;">
+                    <div class="container-fluid">
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                            <ul class="navbar-nav ms-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" href="https://github.com/1014TaoTao/fastapi_jinja2" target="_blank">
+                                        <i class="bi bi-github me-2"></i>GitHub
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" href="https://gitee.com/tao__tao/fastapi_jinja2" target="_blank">
+                                        <i class="bi bi-git me-2"></i>Gitee
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" href="/docs" target="_blank">
+                                        <i class="bi bi-file-earmark-text me-2"></i>接口文档
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" href="/">
+                                        <i class="bi bi-box-arrow-right me-2"></i>退出登录
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </header>
 
-            <!-- 底部 -->
-            <footer>
-                <p>&copy; 2023 FastApi Project. 保留所有权利。</p>
-            </footer>
-        </main>
+                <!-- 面包屑 -->
+                <nav aria-label="breadcrumb" class="mt-3">
+                    <ol class="breadcrumb" style="background-color: #009485; padding: 0.5rem 1rem;">
+                        <!-- 首页链接 -->
+                        <li class="breadcrumb-item">
+                            <a href="/home" class="text-white" title="返回首页">
+                                首页
+                            </a>
+                        </li>
+                        <!-- 当前页面 -->
+                        <li class="breadcrumb-item active text-white" aria-current="page" title="当前页面">
+                            {% block breadcrumb %}{% endblock %}
+                        </li>
+                    </ol>
+                </nav>
+
+                <!-- 内容区 -->
+                <div class="content flex-grow-1 p-md-4">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+
+                <!-- 底部 -->
+                <footer class="py-3" style="background-color: #009485; color: white;">
+                    <div class="container text-center">
+                        <p class="mb-0">&copy; 2023 FastApi Project. 保留所有权利。</p>
+                    </div>
+                </footer>
+            </main>
+        </div>
     </div>
 {% endblock %}

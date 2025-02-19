@@ -62,6 +62,23 @@ fastapi_jinja2
 └─ README.md               # 项目说明文档
 ```
 
+### 页面展示
+<table>
+    <tr>
+        <td><img src="./static/img/login.jpeg"/>登陆</td>
+        <td><img src="./static/img/home.jpeg"/>首页</td>
+   </tr>
+   <tr>
+        <td><img src="./static/img/users.jpeg"/>用户管理</td>
+        <td><img src="./static/img/create_user.jpeg"/>用户新增</td>
+   </tr>
+   <tr>
+        <td><img src="./static/img/update_user.jpeg"/>用户编辑</td>
+        <td><img src="./static/img/delete_user.jpeg"/>用户删除</td>
+   </tr>
+</table>
+
+
 ### 快速开始
 
 - 1、克隆项目
