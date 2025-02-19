@@ -76,6 +76,9 @@ fastapi_jinja2
         <td><img src="./static/img/update_user.jpeg"/>用户编辑</td>
         <td><img src="./static/img/delete_user.jpeg"/>用户删除</td>
    </tr>
+   <tr>
+        <td><img src="./static/img/detail_user.jpeg"/>用户详情</td>
+   </tr>
 </table>
 
 
