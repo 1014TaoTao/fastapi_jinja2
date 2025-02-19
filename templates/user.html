@@ -4,6 +4,30 @@
 {% block breadcrumb %}用户管理{% endblock %}
 
 {% block content %}
+    <!-- 错误消息 -->
+    {% if request.query_params.get('error') %}
+    <div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+        <div class="d-flex">
+            <div class="toast-body">
+                {{ request.query_params.get('error') }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 成功消息 -->
+    {% if request.query_params.get('success') %}
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+        <div class="d-flex">
+            <div class="toast-body">
+                {{ request.query_params.get('success') }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+    {% endif %}
+
     <section class="card mb-4">
         <div class="card-body">
             <!-- 标题 -->
@@ -26,7 +50,7 @@
             </div>
             
             <!-- 用户列表表格 -->
-            <div class="table-responsive">
+            <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -76,17 +100,17 @@
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">密码</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码" required>
+                            <input type="text" class="form-control" id="password" name="password" placeholder="请输入密码" required>
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">描述</label>
                             <textarea class="form-control" id="description" name="description" placeholder="请输入描述" rows="3"></textarea>
                         </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">确认</button>
+                        </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="submit" form="addUserForm" class="btn btn-primary">确认</button>
                 </div>
             </div>
         </div>
@@ -106,9 +130,11 @@
                         确定要删除用户 <strong>{{ user.name }}</strong> 吗？
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <form action="/delete_user/{{ user.id }}" method="POST" style="display: inline;">
-                            <button type="submit" class="btn btn-danger">确认删除</button>
+                        <form id="deleteUserForm{{ user.id }}">
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="submit" class="btn btn-danger">确认删除</button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -136,39 +162,100 @@
             </div>
         </div>
 
-        <!-- 编辑用户模态框 -->
+        <!-- 修改用户模态框 -->
         <div class="modal fade" id="editUserModal{{ user.id }}" tabindex="-1" aria-labelledby="editUserModalLabel{{ user.id }}" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editUserModalLabel{{ user.id }}">编辑用户</h5>
+                        <h5 class="modal-title" id="editUserModalLabel{{ user.id }}">修改用户</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <!-- 表单 -->
                         <form id="editUserForm{{ user.id }}">
-                            <input type="hidden" name="id" value="{{ user.id }}">
                             <div class="mb-3">
                                 <label for="username{{ user.id }}" class="form-label">用户名</label>
-                                <input type="text" class="form-control" id="username{{ user.id }}" name="username" placeholder="请输入用户名" value="{{ user.name }}" required>
+                                <input type="text" class="form-control" id="username{{ user.id }}" name="username" value="{{ user.name }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="password{{ user.id }}" class="form-label">密码</label>
-                                <input type="password" class="form-control" id="password{{ user.id }}" name="password" placeholder="请输入密码" value="{{ user.password }}">
+                                <input type="text" class="form-control" id="password{{ user.id }}" name="password" value=" {{user.password}}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="description{{ user.id }}" class="form-label">描述</label>
-                                <textarea class="form-control" id="description{{ user.id }}" name="description" rows="3">{{ user.description }} </textarea>
+                                <textarea class="form-control" id="description{{ user.id }}" name="description" rows="3">{{ user.description }}</textarea>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="submit" class="btn btn-primary">确认</button>
                             </div>
                         </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="submit" form="editUserForm{{ user.id }}" class="btn btn-primary">确认</button>
                     </div>
                 </div>
             </div>
         </div>
     {% endfor %}
     
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 处理创建用户表单
+            document.getElementById('addUserForm')?.addEventListener('submit', function (e) {
+                e.preventDefault();
+                submitForm(this, 'POST', '/user');
+            });
+
+            // 处理编辑用户表单
+            document.querySelectorAll('[id^="editUserForm"]').forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const userId = form.id.replace('editUserForm', '');
+                    submitForm(form, 'PUT', `/user/${userId}`);
+                });
+            });
+
+            // 处理删除用户表单
+            document.querySelectorAll('[id^="deleteUserForm"]').forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const userId = form.id.replace('deleteUserForm', '');
+                    submitForm(form, 'DELETE', `/user/${userId}`);
+                });
+            });
+
+            // 通用表单提交函数
+            function submitForm(form, method, url) {
+                const formData = new FormData(form);
+                const submitButton = form.querySelector('button[type="submit"]');
+
+                submitButton.disabled = true;
+                submitButton.innerHTML = '提交中...';
+
+                fetch(url, {
+                    method: method,
+                    body: method === 'GET' ? null : formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            window.location.reload(); // 刷新页面
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('请求失败，请稍后重试');
+                    })
+                    .finally(() => {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = method === 'DELETE' ? '确认删除' : '确认';
+                    });
+            }
+        });
+    </script>
 
 {% endblock %}

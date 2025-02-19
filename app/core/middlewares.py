@@ -72,5 +72,3 @@ def register_middleware_handler(app: FastAPI) -> None:
     app.add_middleware(CORSMiddleware)
     app.add_middleware(CustomGZipMiddleware)
     app.add_middleware(RequestLogMiddleware)
-
-

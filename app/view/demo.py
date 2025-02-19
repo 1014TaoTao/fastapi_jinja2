@@ -16,8 +16,13 @@ templates = templating.Jinja2Templates(directory="templates")
 
 router = APIRouter()
 
+def json_response(success: bool, message: str, data: Optional[dict] = None):
+    return JSONResponse(
+        status_code=200 if success else 400,
+        content={"success": success, "message": message, "data": data}
+    )
 
-@router.get("/users", summary="分页获取用户数据")
+@router.get("/users", summary="用户列表")
 def list(
     request: Request,
     filters: UserFilterParams = Depends(),
@@ -36,104 +41,58 @@ def list(
         },
     )
 
-# @router.post("/create", summary="创建用户")
-# def create(request: Request, user: UserCreateSchema, db: Session = Depends(get_db)):
-#     """创建用户"""
-#     # 检查用户名是否已存在
-#     existing_user = BaseCRUD(db).get(User, filters={"name": ("eq", user.name)})
-#     if existing_user:
-#         return templates.TemplateResponse(
-#             "user.html",
-#             {
-#                 "request": request,
-#                 "user": None,
-#                 "message": "用户名已存在",
-#                 "success": False,
-#             },
-#         )
-#     # 创建用户
-#     db_user = BaseCRUD(db).create(User, user)
-#     return templates.TemplateResponse(
-#         "user.html",
-#         {
-#             "request": request,
-#             "user": db_user.model_dump(),
-#             "message": "用户创建成功",
-#             "success": True,
-#         },
-#     )
+@router.post("/user", summary="创建用户")
+def create(
+    username: str = Form(...),
+    password: str = Form(...),
+    description: str = Form(None), 
+    db: Session = Depends(get_db)
+):
+    """创建用户"""
+    existing_user = BaseCRUD(db).get(User, filters={"name": ("eq", username)})
+    if existing_user:
+        return json_response(success=False, message="用户名已存在")
+    
+    user_data = UserCreateSchema(name=username, password=password, description=description)
+    user = BaseCRUD(db).create(User, user_data)
+    return json_response(success=True, message="用户创建成功", data=user.model_dump())
 
-# @router.put("/update/{user_id}", summary="更新用户")
-# def update(request: Request, user: UserUpdateSchema, user_id: int = Path(..., example=1), db: Session = Depends(get_db)):
-#     """更新用户"""
-#     # 检查用户是否存在
-#     existing_user = BaseCRUD(db).get(User, filters={"id": ("eq", user_id)})
-#     if not existing_user:
-#         return templates.TemplateResponse(
-#             "user.html",
-#             {
-#                 "request": request,
-#                 "user": None,
-#                 "message": "用户不存在",
-#                 "success": False,
-#             },
-#         )
-#     if existing_user.is_superuser:
-#         return templates.TemplateResponse(
-#             "user.html",
-#             {
-#                 "request": request,
-#                 "user": None,
-#                 "message": "超级管理员不允许修改",
-#                 "success": False,
-#             },
-#         )
-#     # 更新用户
-#     db_user = BaseCRUD(db).update(User, user_id, user)
-#     return templates.TemplateResponse(
-#         "user.html",
-#         {
-#             "request": request,
-#             "user": db_user.model_dump(),
-#             "message": "用户更新成功",
-#             "success": True,
-#         },
-#     )
+@router.put("/user/{user_id}", summary="更新用户")
+def update(
+    username: str = Form(...),
+    password: str = Form(...),
+    description: str = Form(None), 
+    user_id: int = Path(..., example=1), 
+    db: Session = Depends(get_db)
+):
+    """更新用户"""
+    existing_user = BaseCRUD(db).get(User, filters={"id": ("eq", user_id)})
+    if not existing_user:
+        return json_response(success=False, message="用户不存在")
 
-# @router.delete("/delete/{user_id}", summary="删除用户")
-# def delete(request: Request, user_id: int = Path(..., example=1), db: Session = Depends(get_db)):
-#     """删除用户"""
-#     existing_user = BaseCRUD(db).get(User, filters={"id": ("eq", user_id)})
-#     if not existing_user:
-#         return templates.TemplateResponse(
-#             "user.html",
-#             {
-#                 "request": request,
-#                 "user": None,
-#                 "message": "用户不存在",
-#                 "success": False,
-#             },
-#         )
-#     if existing_user.is_superuser:
-#         return templates.TemplateResponse(
-#             "user.html",
-#             {
-#                 "request": request,
-#                 "user": None,
-#                 "message": "超级管理员不允许删除",
-#                 "success": False,
-#             },
-#         )
-#     result = BaseCRUD(db).delete(User, user_id)
-#     return templates.TemplateResponse(
-#         "user.html",
-#         {
-#             "request": request,
-#             "user": result,
-#             "message": "用户删除成功",
-#             "success": True,
-#         },
-#     )
+    if existing_user.is_superuser:
+        return json_response(success=False, message="超级管理员不允许修改")
+
+    user_data = UserUpdateSchema(name=username, password=password, description=description)
+    user = BaseCRUD(db).update(User, user_id, user_data)
+    return json_response(success=True, message="用户更新成功", data=user.model_dump())
+
+
+@router.delete("/user/{user_id}", summary="删除用户")
+def delete(
+    user_id: int = Path(..., example=1),
+    db: Session = Depends(get_db)
+):
+    """删除用户"""
+    existing_user = BaseCRUD(db).get(User, filters={"id": ("eq", user_id)})
+    if not existing_user:
+        return json_response(success=False, message="用户不存在")
+
+    if existing_user.is_superuser:
+        return json_response(success=False, message="超级管理员不允许删除")
+
+    result = BaseCRUD(db).delete(User, user_id)
+    return json_response(success=True, message="用户删除成功", data=result)
 
 
 @router.get("/", summary="登陆页面")

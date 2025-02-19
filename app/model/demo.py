@@ -15,7 +15,6 @@ class UserUpdateSchema(SQLModel):
     name: Optional[str] = Field(default=None, description="用户名")
     password: Optional[str] = Field(default=None, description="密码")
     description: Optional[str] = Field(default=None, description="描述")
-    is_superuser: Optional[bool] = Field(default=False, description="是否超级用户")
 
 # 响应模型
 class UserOutSchema(SQLModel):
