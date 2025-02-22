@@ -239,7 +239,7 @@
                 })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.success) {
+                        if (data.result) {
                             alert(data.message);
                             window.location.reload(); // 刷新页面
                         } else {

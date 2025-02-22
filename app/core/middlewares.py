@@ -13,7 +13,6 @@ from app.core.logger import logger
 
 class CustomCORSMiddleware(CORSMiddleware):
     """CORS跨域中间件"""
-
     def __init__(self, app: ASGIApp) -> None:
         super().__init__(
             app,
@@ -23,14 +22,6 @@ class CustomCORSMiddleware(CORSMiddleware):
             allow_credentials=True
         )
 
-class CustomGZipMiddleware(GZipMiddleware):
-    """GZip压缩中间件"""
-    def __init__(self, app: ASGIApp) -> None:
-        super().__init__(
-            app,
-            minimum_size=1000,
-            compresslevel=9
-        )
 
 class RequestLogMiddleware(BaseHTTPMiddleware):
     """
@@ -69,6 +60,5 @@ class RequestLogMiddleware(BaseHTTPMiddleware):
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"系统异常，请联系管理员: {str(e)}")
 
 def register_middleware_handler(app: FastAPI) -> None:
-    app.add_middleware(CORSMiddleware)
-    app.add_middleware(CustomGZipMiddleware)
+    app.add_middleware(CustomCORSMiddleware)
     app.add_middleware(RequestLogMiddleware)

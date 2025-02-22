@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from typing import Any, AsyncGenerator
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.concurrency import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 
 from app.core.exceptions import register_exception_handler
 from app.core.middlewares import register_middleware_handler
-from app.core.router import register_router_handler
 from app.core.logger import logger
 
 
@@ -41,14 +40,17 @@ def create_app() -> FastAPI:
     # 挂载静态文件
     app.mount(path="/static", app=StaticFiles(directory="static"), name="static")
 
-    # 注册路由
-    register_router_handler(app)
-
     # 注册中间件
     register_middleware_handler(app)
 
     # 注册异常
     register_exception_handler(app)
+
+    # 注册路由
+    from app.view.demo import router as demo_router
+    Router = APIRouter(prefix="")
+    Router.include_router(router=demo_router, tags=["案例接口"])
+    app.include_router(Router)
 
     return app
 

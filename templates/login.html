@@ -22,7 +22,7 @@
                 </form>
                 <div class="mt-4">
                     {% if message %}
-                    <div class="alert {% if success %}alert-success{% else %}alert-danger{% endif %}" role="alert">
+                    <div class="alert {% if result %}alert-success{% else %}alert-danger{% endif %}" role="alert">
                         {{ message }}
                     </div>
                     {% endif %}
