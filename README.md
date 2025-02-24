@@ -117,6 +117,6 @@ fastapi_jinja2
 
 <table>
     <tr>
-        <td><img src="./static/img/wechat.png"/></td>
+        <td><img src="./static/img/wechat.png" height="300" /></td>
     </tr>
 </table>
