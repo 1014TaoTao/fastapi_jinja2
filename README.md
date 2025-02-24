@@ -108,3 +108,15 @@ fastapi_jinja2
 
 - [FastAPI 项目](https://fastapi.tiangolo.com/)
 - [Jinja2 项目](https://jinja.palletsprojects.com/en/stable/)
+
+## 🎨 微信群
+
+在下方为群二维码，可以用于技术交流，也可以一起讨论在项目使用过程中遇到的各种问题。真心希望大家一起优化该项目，积极讨论，让我们一起抱团取暖！
+
+### 群二维码
+
+<table>
+    <tr>
+        <td><img src="./static/img/wechat.png"/></td>
+    </tr>
+</table>
