@@ -2,7 +2,7 @@
 
 import time
 from loguru import logger
-from app.core.setting import settings
+from app.core.config import settings
 
 # 移除控制台输出
 # logger.remove(handler_id=None)

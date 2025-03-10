@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from typing import Optional
+from typing import Any, Optional
 from fastapi import Request, APIRouter, Depends, status, Path, Form, templating
 from fastapi.responses import RedirectResponse, JSONResponse
 from sqlmodel import Session
 
+from app.core.agent import Agent
 from app.core.crud import BaseCRUD
 from app.model.demo import UserFilterParams, User, UserCreateSchema, UserUpdateSchema, UserOutSchema
-from app.core.database import get_db 
+from app.core.database import get_db
+from app.core.config import settings
 
 templates = templating.Jinja2Templates(directory="templates")
 
 router = APIRouter()
 
-def json_response(result: bool, message: str, data: Optional[dict] = None):
+def json_response(result: bool, message: str, data: Optional[Any] = None):
     return JSONResponse(
         status_code=200 if result else 400,
         content={"result": result, "message": message, "data": data}
@@ -104,7 +106,7 @@ async def login_page(request: Request):
 
 @router.post("/login", summary="登陆请求")
 async def login(request: Request, username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
-    existing_user = BaseCRUD(db).get(User, filters={"name": ("eq", username)})
+    existing_user = BaseCRUD(db).get(User, filters={"username": ("eq", username)})
     if not existing_user or existing_user.password != password:
         return templates.TemplateResponse(
             name="login.html",
@@ -122,3 +124,24 @@ async def home(request: Request):
         name="home.html",
         context={"request": request}
     )
+
+@router.get("/ai", summary="大模型")
+async def home(request: Request):
+    return templates.TemplateResponse(
+        name="ai.html",
+        context={"request": request}
+    )
+
+@router.post("/ai", summary="智能体")
+async def home(model_type: str= Form(...), query: str= Form(...)):
+    if model_type == "qwen":
+        agent = Agent(base_url=settings.QWEN_BASE_URL, model=settings.QWEN_MODEL, api_key=settings.QWEN_API_KEY)
+    elif model_type == "deepseek":
+        agent = Agent(base_url=settings.DEEPSEEK_BASE_URL, model=settings.DEEPSEEK_MODEL, api_key=settings.DEEPSEEK_API_KEY)
+    else:
+        return json_response(result=False, message="模型类型错误")
+    
+    result = await agent.seed_message(query)
+    
+
+    return json_response(result=True, message="对话成功", data=result)

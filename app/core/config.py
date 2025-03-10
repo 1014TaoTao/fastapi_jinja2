@@ -18,6 +18,17 @@ class Settings(BaseSettings):
     # sqlite 数据库名称
     SQLITE_DB_NAME: str
 
+    # 千问大模型配置
+    QWEN_BASE_URL: str
+    QWEN_API_KEY: str
+    QWEN_MODEL: str
+
+    # deepseek 大模型配置
+    DEEPSEEK_BASE_URL: str
+    DEEPSEEK_API_KEY: str
+    DEEPSEEK_MODEL: str
+
+
     @property
     def DATABASE_URL(self) -> str:
         """数据库连接地址"""

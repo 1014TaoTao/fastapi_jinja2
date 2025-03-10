@@ -7,3 +7,4 @@ venv
 DS_Store
 sqlite.db
 logs
+app/__pycache__

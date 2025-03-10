@@ -56,6 +56,7 @@
                         <tr>
                             <th>ID</th>
                             <th>用户名</th>
+                            <th>账号</th>
                             <th>密码</th>
                             <th>超级管理员</th>
                             <th>描述</th>
@@ -67,6 +68,7 @@
                         <tr>
                             <td>{{ user.id }}</td>
                             <td>{{ user.name }}</td>
+                            <td>{{ user.username }}</td>
                             <td>{{ user.password }}</td> <!-- 不显示密码 -->
                             <td>{{ '是' if user.is_superuser else '否' }}</td>
                             <td>{{ user.description }}</td>
@@ -96,6 +98,10 @@
                     <form id="addUserForm">
                         <div class="mb-3">
                             <label for="username" class="form-label">用户名</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="请输入用户名" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">账号</label>
                             <input type="text" class="form-control" id="username" name="username" placeholder="请输入用户名" required>
                         </div>
                         <div class="mb-3">
@@ -151,6 +157,7 @@
                     </div>
                     <div class="modal-body">
                         <p><strong>用户名:</strong> {{ user.name }}</p>
+                        <p><strong>账号:</strong> {{ user.username }}</p>
                         <p><strong>密码:</strong> {{ user.password }}</p>
                         <p><strong>超级管理员:</strong> {{ '是' if user.is_superuser else '否' }}</p>
                         <p><strong>描述:</strong> {{ user.description }}</p>
@@ -175,7 +182,11 @@
                         <form id="editUserForm{{ user.id }}">
                             <div class="mb-3">
                                 <label for="username{{ user.id }}" class="form-label">用户名</label>
-                                <input type="text" class="form-control" id="username{{ user.id }}" name="username" value="{{ user.name }}" required>
+                                <input type="text" class="form-control" id="name{{ user.id }}" name="name" value="{{ user.name }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="username{{ user.id }}" class="form-label">账号</label>
+                                <input type="text" class="form-control" id="username{{ user.id }}" name="username" value="{{ user.username }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="password{{ user.id }}" class="form-label">密码</label>

@@ -1,0 +1,116 @@
+<!-- templates/ai.html -->
+{% extends "layout.html" %}
+
+{% block title %}大模型对话{% endblock %}
+{% block breadcrumb %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">大模型对话</h2>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="chat-container" id="chat-container">
+                        <!-- 对话历史记录 -->
+                    </div>
+                    <div class="input-group mt-4">
+                        <select class="form-select" id="model-select">
+                            <option value="qwen">Qwen</option>
+                            <option value="deepseek">DeepSeek</option>
+                            <!-- 添加更多模型选项 -->
+                        </select>
+                        <input type="text" class="form-control" id="user-input" placeholder="输入你的问题...">
+                        <button class="btn btn-primary" id="send-button">发送</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatContainer = document.getElementById('chat-container');
+    const userInput = document.getElementById('user-input');
+    const sendButton = document.getElementById('send-button');
+    const modelSelect = document.getElementById('model-select');
+
+    sendButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    function sendMessage() {
+        const message = userInput.value.trim();
+        if (message === '') return;
+
+        // 显示用户消息
+        appendMessage('user', message);
+
+        // 清空输入框
+        userInput.value = '';
+
+        // 发送消息到服务器
+        const modelType = modelSelect.value;
+        const formData = new FormData();
+        formData.append('model_type', modelType);
+        formData.append('query', message);
+
+        fetch('/ai', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.result) {
+                appendMessage('ai', data.data);
+            } else {
+                appendMessage('ai', '对话失败，请重试。');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            appendMessage('ai', '对话失败，请重试。');
+        });
+    }
+
+    function appendMessage(sender, message) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', sender);
+        messageElement.textContent = message;
+        chatContainer.appendChild(messageElement);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+});
+</script>
+
+<style>
+.chat-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.message {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.message.user {
+    background-color: #e0f7fa;
+    text-align: right;
+}
+
+.message.ai {
+    background-color: #fff59d;
+    text-align: left;
+}
+</style>
+{% endblock %}

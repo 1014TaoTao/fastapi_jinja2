@@ -2,8 +2,7 @@
    <p align="center">
       <img src="./static/favicon.png" height="150" alt="logo"/>
    </p>
-      <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Fastapi_Jinja2</h1>
-
+   <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Fastapi_Jinja2</h1>
    <p align="center">
       <a href="https://gitee.com/tao__tao/fastapi_jinja2.git">
          <img src="https://gitee.com/tao__tao/fastapi_jinja2/badge/star.svg?theme=dark">
@@ -28,7 +27,7 @@ FastAPI-Jinja2 是一个整合了多个流行技术栈的开源项目，旨在�
 - **Jinja2**: 强大的模板引擎，用于生成HTML页面。
 - **SQLModel**: 简单易用的ORM工具，简化数据库操作。
 - **Loguru**: 灵活的日志记录库，提升日志管理效率。
-- **Celery**: 分布式任务队列，处理后台任务。
+- **Alembic**: 数据库迁移工具，用于管理数据库版本。
 
 ### 参与和支持
 
@@ -91,10 +90,16 @@ fastapi_jinja2
 
   - cd fastapi_jinja2
   - pip install -r requirements.txt
+  - alembic init app/alembic
+  <!-- 生成迁移 -->
+  - alembic revision --autogenerate -m "初始化迁移"
+  <!-- 应用迁移 -->
+  - alembic upgrade head
 
 - 3、启动项目：
-
-  - python3 main.py
+  - python3 main.py revision 初始化迁移
+  - python3 main.py upgrade
+  - python3 main.py run
 
 - 4、访问项目：
   
