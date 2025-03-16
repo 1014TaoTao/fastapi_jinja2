@@ -11,18 +11,18 @@
                 </div>
                 <form method="post" action="/login">
                     <div class="mb-3">
-                        <label for="username" class="form-label">账号:admin</label>
+                        <label for="username" class="form-label">账号</label>
                         <input type="text" id="username" name="username" class="form-control" placeholder="请输入账号" required>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">密码:123456</label>
+                        <label for="password" class="form-label">密码</label>
                         <input type="password" id="password" name="password" class="form-control" placeholder="请输入密码" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100 text-white" style="background-color: #26a699; border-color: #26a699;">登录</button>
                 </form>
                 <div class="mt-4">
-                    {% if message %}
-                    <div class="alert {% if result %}alert-success{% else %}alert-danger{% endif %}" role="alert">
+                    {% if code == 401 %}
+                    <div class="alert alert-danger" role="alert">
                         {{ message }}
                     </div>
                     {% endif %}

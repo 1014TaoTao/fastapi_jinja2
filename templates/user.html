@@ -4,269 +4,475 @@
 {% block breadcrumb %}用户管理{% endblock %}
 
 {% block content %}
-    <!-- 错误消息 -->
-    {% if request.query_params.get('error') %}
-    <div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+<!-- Toast 容器 -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    {% if request.query_params.get('error') or request.query_params.get('success') %}
+    <div class="toast align-items-center text-bg-{{ 'danger' if request.query_params.get('error') else 'success' }} border-0"
+        role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
         <div class="d-flex">
             <div class="toast-body">
-                {{ request.query_params.get('error') }}
+                {{ request.query_params.get('error') or request.query_params.get('success') }}
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
         </div>
     </div>
     {% endif %}
+</div>
 
-    <!-- 成功消息 -->
-    {% if request.query_params.get('success') %}
-    <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
-        <div class="d-flex">
-            <div class="toast-body">
-                {{ request.query_params.get('success') }}
+<section class="card shadow-sm mb-2">
+    <div class="card-body">
+        <!-- 标题和工具栏 -->
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-2">
+            <h5 class="card-title mb-0">用户列表</h5>
+        </div>
+
+        <!-- 查询表单 -->
+        <form class="d-flex justify-content-between align-items-center mb-2" method="get" action="/users">
+            <div class="d-flex gap-2">
+                <div class="input-group" style="width: 250px;">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="name" class="form-control" placeholder="搜索用户名"
+                        value='{{ request.query_params.get("name", "") }}'>
+                </div>
+                <button type="submit" class="btn btn-secondary">搜索</button>
+                <a href="/users" class="btn btn-outline-secondary">重置</a>
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="bi bi-plus-lg me-1"></i>新增用户
+            </button>
+        </form>
+
+        <!-- 用户列表表格 -->
+        <div class="table-responsive border rounded" style="height: 522px;">
+            <table class="table table-hover table-striped mb-0">
+                <thead class="position-sticky top-0 bg-light">
+                    <tr>
+                        <th class="border-bottom-0" style="width: 80px;">ID</th>
+                        <th class="border-bottom-0" style="width: 150px;">用户名</th>
+                        <th class="border-bottom-0" style="width: 150pxpx;">账号</th>
+                        <th class="border-bottom-0" style="width: 150pxpx;">密码</th>
+                        <th class="border-bottom-0" style="width: 150pxpx;">超级管理员</th>
+                        <th class="border-bottom-0">描述</th>
+                        <th class="text-center border-bottom-0" style="width: 220px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% for user in data['items'] %}
+                    <tr>
+                        <td scope="row">{{ user.id }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.username }}</td>
+                        <td><span class="text-muted">********</span></td>
+                        <td><span class="badge {% if user.is_superuser %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ '是' if user.is_superuser else '否' }}</span>
+                        </td>
+                        <td class="text-truncate" style="max-width: 200px;" title="{{ user.description }}">
+                            {{ user.description or '-' }}</td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group" aria-label="操作">
+                                <button type="button" class="btn btn-sm btn btn-outline-info" data-bs-toggle="modal"
+                                    data-bs-target="#detailUserModal{{ user.id }}" {% if user.is_superuser %}disabled{% endif %}>
+                                    <i class="bi bi-eye me-1"></i>详情
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
+                                    data-bs-target="#editUserModal{{ user.id }}" {% if user.is_superuser %}disabled{% endif %}>
+                                    <i class="bi bi-pencil me-1"></i>修改
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteUserModal{{ user.id }}" {% if user.is_superuser %}disabled{% endif %}>
+                                    <i class="bi bi-trash me-1"></i>删除
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="text-secondary">
+                共 {{ data.total }} 条记录，第 {{ data.page_no }} / {{ data.total_pages }} 页
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <select class="form-select form-select-sm" style="width: 100px;" onchange="changePage(1, this.value)">
+                    {% for size in [10, 20, 50] %}
+                    <option value="{{ size }}" {% if data.page_size==size %}selected{% endif %}>{{ size }}条/页</option>
+                    {% endfor %}
+                </select>
+
+                <nav aria-label="分页导航">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item {% if data.page_no == 1 %}disabled{% endif %}">
+                            <a class="page-link" href="javascript:void(0)" onclick="changePage(1)" aria-label="首页">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% set start = [data.page_no - 2, 1] | max %}
+                        {% set end = [start + 4, data.total_pages + 1] | min %}
+                        {% for i in range(start, end) %}
+                        <li class="page-item {% if data.page_no == i %}active{% endif %}">
+                            <a class="page-link" href="javascript:void(0)" onclick="changePage('{{ i }}')">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        <li class="page-item {% if not data.has_next %}disabled{% endif %}">
+                            <a class="page-link" href="javascript:void(0)" onclick="changePage('{{ data.total_pages }}')"
+                                aria-label="末页">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
-    {% endif %}
+</section>
 
-    <section class="card mb-4">
-        <div class="card-body">
-            <!-- 标题 -->
-            <h2 class="card-title mb-4">用户列表</h2>
-            
-            <!-- 查询表单 -->
-            <div class="d-flex align-items-center mb-3">
-                <form class="d-flex align-items-center" method="get" action="/users">
-                    <div class="form-group mr-2 mb-0"> <!-- 使用 mb-0 去除默认的 margin-bottom -->
-                        <input type="text" name="name" class="form-control" placeholder="用户名" value="{{ request.query_params.get('name', '') }}" style="width: 200px;"> <!-- 调整输入框宽度 -->
+<!-- 新增用户模态框 -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">
+                    <i class="bi bi-person-plus me-1"></i>新增用户
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">用户名 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" placeholder="请输入用户名" required minlength="2" maxlength="50">
+                        <div class="invalid-feedback">请输入2-50个字符的用户名</div>
                     </div>
-                    <button type="submit" class="btn btn-secondary">查询</button>
+                    <div class="mb-3">
+                        <label class="form-label">账号 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="username" placeholder="请输入账号" required minlength="4" maxlength="20" pattern="^[a-zA-Z0-9_-]+$">
+                        <div class="invalid-feedback">请输入4-20个字符的账号(只能包含字母、数字、下划线和中划线)</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">密码 <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" name="password" placeholder="请输出密码" required minlength="6" maxlength="20">
+                        <div class="invalid-feedback">请输入6-20个字符的密码</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">描述</label>
+                        <textarea class="form-control" name="description" placeholder="请输入描述" rows="3" maxlength="200"></textarea>
+                        <div class="invalid-feedback">描述不能超过200个字符</div>
+                    </div>
+                    <div class="modal-footer pt-0 border-top-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary">确认</button>
+                    </div>
                 </form>
             </div>
-
-            <!-- 重置查询和新增用户按钮 -->
-            <div class="mb-4">
-                <a href="/users" class="btn btn-secondary mr-2">重置查询</a>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">新增用户</button>
-            </div>
-            
-            <!-- 用户列表表格 -->
-            <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>用户名</th>
-                            <th>账号</th>
-                            <th>密码</th>
-                            <th>超级管理员</th>
-                            <th>描述</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                        <tr>
-                            <td>{{ user.id }}</td>
-                            <td>{{ user.name }}</td>
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.password }}</td> <!-- 不显示密码 -->
-                            <td>{{ '是' if user.is_superuser else '否' }}</td>
-                            <td>{{ user.description }}</td>
-                            <td>
-                                <button type="button" class="btn btn-info btn-sm mr-1" data-bs-toggle="modal" data-bs-target="#detailUserModal{{ user.id }}">详情</button>
-                                <button type="button" class="btn btn-warning btn-sm mr-1" data-bs-toggle="modal" data-bs-target="#editUserModal{{ user.id }}">修改</button>
-                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.id }}">删除</button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
         </div>
-    </section>
+    </div>
+</div>
 
-    <!-- 新增用户模态框 -->
-    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addUserModalLabel">新增用户</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- 用户操作模态框 -->
+{% for user in data['items'] %}
+<!-- 详情模态框 -->
+<div class="modal fade" id="detailUserModal{{ user.id }}" tabindex="-1" aria-labelledby="detailUserModalLabel{{ user.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailUserModalLabel{{ user.id }}">
+                    <i class="bi bi-person me-1"></i>用户详情
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-secondary">用户名</span>
+                        <span>{{ user.name }}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-secondary">账号</span>
+                        <span>{{ user.username }}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-secondary">密码</span>
+                        <span class="text-muted">********</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-secondary">超级管理员</span>
+                        <span>{{ '是' if user.is_superuser else '否' }}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-secondary">描述</span>
+                        <span>{{ user.description or '-' }}</span>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <!-- 表单 -->
-                    <form id="addUserForm">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">用户名</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="请输入用户名" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="username" class="form-label">账号</label>
-                            <input type="text" class="form-control" id="username" name="username" placeholder="请输入用户名" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">密码</label>
-                            <input type="text" class="form-control" id="password" name="password" placeholder="请输入密码" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="description" class="form-label">描述</label>
-                            <textarea class="form-control" id="description" name="description" placeholder="请输入描述" rows="3"></textarea>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                            <button type="submit" class="btn btn-primary">确认</button>
-                        </div>
-                    </form>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
             </div>
         </div>
     </div>
+</div>
 
-
-    {% for user in users %}
-        <!-- 删除确认模态框 -->
-        <div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1" aria-labelledby="deleteUserModalLabel{{ user.id }}" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteUserModalLabel{{ user.id }}">删除用户</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- 编辑模态框 -->
+<div class="modal fade" id="editUserModal{{ user.id }}" tabindex="-1" aria-labelledby="editUserModalLabel{{ user.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel{{ user.id }}">
+                    <i class="bi bi-person-gear me-1"></i>修改用户
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm{{ user.id }}" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">用户名 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" placeholder="请输入用户名" value="{{ user.name }}" required minlength="2" maxlength="50">
+                        <div class="invalid-feedback">请输入2-50个字符的用户名</div>
                     </div>
-                    <div class="modal-body">
-                        确定要删除用户 <strong>{{ user.name }}</strong> 吗？
+                    <div class="mb-3">
+                        <label class="form-label">账号 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="username" placeholder="请输入账号" value="{{ user.username }}" required minlength="4" maxlength="20" pattern="^[a-zA-Z0-9_-]+$">
+                        <div class="invalid-feedback">请输入4-20个字符的账号(只能包含字母、数字、下划线和中划线)</div>
                     </div>
-                    <div class="modal-footer">
-                        <form id="deleteUserForm{{ user.id }}">
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                                <button type="submit" class="btn btn-danger">确认删除</button>
-                            </div>
-                        </form>
+                    <div class="mb-3">
+                        <label class="form-label">密码 <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" name="password" placeholder="请输出密码" value="{{ user.password }}" required minlength="6" maxlength="20">
+                        <div class="invalid-feedback">请输入6-20个字符的密码</div>
                     </div>
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label">描述</label>
+                        <textarea class="form-control" name="description" placeholder="请输入描述" rows="3" maxlength="200">{{ user.description }}</textarea>
+                        <div class="invalid-feedback">描述不能超过200个字符</div>
+                    </div>
+                    <div class="modal-footer pt-0 border-top-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary">确认</button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- 用户详情模态框 -->
-        <div class="modal fade" id="detailUserModal{{ user.id }}" tabindex="-1" aria-labelledby="detailUserModalLabel{{ user.id }}" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="detailUserModalLabel{{ user.id }}">用户详情</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>用户名:</strong> {{ user.name }}</p>
-                        <p><strong>账号:</strong> {{ user.username }}</p>
-                        <p><strong>密码:</strong> {{ user.password }}</p>
-                        <p><strong>超级管理员:</strong> {{ '是' if user.is_superuser else '否' }}</p>
-                        <p><strong>描述:</strong> {{ user.description }}</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
-                    </div>
+<!-- 删除模态框 -->
+<div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1" aria-labelledby="deleteUserModalLabel{{ user.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteUserModalLabel{{ user.id }}">
+                    <i class="bi bi-person-x me-1"></i>删除用户
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                    <p class="mt-3">确定要删除用户 <strong class="text-danger">{{ user.name }}</strong> 吗？</p>
+                    <p class="text-secondary">删除后数据将无法恢复</p>
                 </div>
             </div>
-        </div>
-
-        <!-- 修改用户模态框 -->
-        <div class="modal fade" id="editUserModal{{ user.id }}" tabindex="-1" aria-labelledby="editUserModalLabel{{ user.id }}" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editUserModalLabel{{ user.id }}">修改用户</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <!-- 表单 -->
-                        <form id="editUserForm{{ user.id }}">
-                            <div class="mb-3">
-                                <label for="username{{ user.id }}" class="form-label">用户名</label>
-                                <input type="text" class="form-control" id="name{{ user.id }}" name="name" value="{{ user.name }}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="username{{ user.id }}" class="form-label">账号</label>
-                                <input type="text" class="form-control" id="username{{ user.id }}" name="username" value="{{ user.username }}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password{{ user.id }}" class="form-label">密码</label>
-                                <input type="text" class="form-control" id="password{{ user.id }}" name="password" value=" {{user.password}}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="description{{ user.id }}" class="form-label">描述</label>
-                                <textarea class="form-control" id="description{{ user.id }}" name="description" rows="3">{{ user.description }}</textarea>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                                <button type="submit" class="btn btn-primary">确认</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" onclick="handleDelete('{{ user.id }}')">
+                    <i class="bi bi-trash me-1"></i>确认删除
+                </button>
             </div>
         </div>
-    {% endfor %}
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // 处理创建用户表单
-            document.getElementById('addUserForm')?.addEventListener('submit', function (e) {
-                e.preventDefault();
-                submitForm(this, 'POST', '/user');
+    </div>
+</div>
+{% endfor %}
+
+<style>
+/* 表格样式 */
+.table-wrapper {
+    height: calc(100vh - var(--header-height) - var(--breadcrumb-height) - var(--footer-height) - 200px);
+    min-height: 520px;
+    border-radius: var(--border-radius);
+}
+
+/* 按钮样式 */
+.btn-primary {
+    background-color: var(--fastapi-primary);
+    border-color: var(--fastapi-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--fastapi-hover);
+    border-color: var(--fastapi-hover);
+}
+</style>
+
+<script>
+const CONFIG = {
+    API_ENDPOINTS: {
+        USER: '/user',
+        USERS: '/users'
+    },
+    MESSAGES: {
+        SUCCESS: '操作成功',
+        ERROR: '操作失败',
+        NETWORK_ERROR: '网络错误，请稍后重试'
+    },
+    THEME: {
+        PRIMARY_COLOR: getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim(),
+        PRIMARY_HOVER_COLOR: getComputedStyle(document.documentElement).getPropertyValue('--primary-hover-color').trim(),
+        BORDER_RADIUS: getComputedStyle(document.documentElement).getPropertyValue('--border-radius').trim(),
+    }
+};
+
+// API响应处理器
+class ResponseHandler {
+    static handle(response) {
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+        return response.json();
+    }
+
+    static handleError(error) {
+        console.error('API Error:', error);
+        return Promise.reject(error);
+    }
+}
+
+// 改进的UserApi类
+class UserApi {
+    static async request(endpoint, options = {}) {
+        try {
+            const response = await fetch(endpoint, {
+                ...options,
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
             });
+            return ResponseHandler.handle(response);
+        } catch (error) {
+            return ResponseHandler.handleError(error);
+        }
+    }
 
-            // 处理编辑用户表单
-            document.querySelectorAll('[id^="editUserForm"]').forEach(form => {
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    const userId = form.id.replace('editUserForm', '');
-                    submitForm(form, 'PUT', `/user/${userId}`);
-                });
-            });
-
-            // 处理删除用户表单
-            document.querySelectorAll('[id^="deleteUserForm"]').forEach(form => {
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    const userId = form.id.replace('deleteUserForm', '');
-                    submitForm(form, 'DELETE', `/user/${userId}`);
-                });
-            });
-
-            // 通用表单提交函数
-            function submitForm(form, method, url) {
-                const formData = new FormData(form);
-                const submitButton = form.querySelector('button[type="submit"]');
-
-                submitButton.disabled = true;
-                submitButton.innerHTML = '提交中...';
-
-                fetch(url, {
-                    method: method,
-                    body: method === 'GET' ? null : formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.result) {
-                            alert(data.message);
-                            window.location.reload(); // 刷新页面
-                        } else {
-                            alert(data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('请求失败，请稍后重试');
-                    })
-                    .finally(() => {
-                        submitButton.disabled = false;
-                        submitButton.innerHTML = method === 'DELETE' ? '确认删除' : '确认';
-                    });
-            }
+    static create(formData) {
+        return this.request('/user', {
+            method: 'POST',
+            body: formData
         });
-    </script>
+    }
 
+    static update(id, formData) {
+        return this.request(`/user/${id}`, {
+            method: 'PUT',
+            body: formData
+        });
+    }
+
+    static delete(id) {
+        return this.request(`/user/${id}`, {
+            method: 'DELETE'
+        });
+    }
+}
+
+// 改进的FormValidator类
+class FormValidator {
+    static init() {
+        this.initForms();
+        this.initToast();
+    }
+
+    static initForms() {
+        document.querySelectorAll('.needs-validation').forEach(form => {
+            form.addEventListener('submit', this.handleSubmit.bind(this));
+        });
+    }
+
+    static initToast() {
+        const toast = document.querySelector('.toast');
+        if (toast) {
+            new bootstrap.Toast(toast, {
+                autohide: true,
+                delay: 3000
+            }).show();
+        }
+    }
+
+    static handleSubmit(event) {
+        const form = event.target;
+        event.preventDefault();
+        
+        if (!form.checkValidity()) {
+            event.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+        }
+
+        // 创建FormData实例
+        const formData = new FormData(form);
+        const id = form.id.replace(/[^\d]/g, '');
+
+        const modal = bootstrap.Modal.getInstance(form.closest('.modal'));
+        if (modal) {
+            modal.hide();
+        }
+        
+        let promise;
+        if (form.id.includes('add')) {
+            promise = UserApi.create(formData);
+        } else if (form.id.includes('edit')) {
+            promise = UserApi.update(id, formData);
+        } else if (form.id.includes('delete')) {
+            promise = UserApi.delete(id);
+        }
+
+        if (promise) {
+            promise
+                .then(() => this.handleSuccess())
+                .catch(error => this.handleError(error));
+        }
+    }
+
+    static handleSuccess(message = '操作成功') {
+        window.location.href = `/users?success=${encodeURIComponent(message)}`;
+    }
+
+    static handleError(error) {
+        window.location.href = `/users?error=${encodeURIComponent(error.message)}`;
+    }
+}
+
+// 添加错误边界处理
+window.addEventListener('unhandledrejection', event => {
+    console.error('Unhandled promise rejection:', event.reason);
+    alert(CONFIG.MESSAGES.NETWORK_ERROR);
+});
+
+// 应用初始化
+document.addEventListener('DOMContentLoaded', () => {
+    FormValidator.init();
+});
+
+// 分页方法
+window.changePage = function(pageNo, pageSize) {
+    const params = new URLSearchParams(window.location.search);
+    if (pageSize) params.set('limit', pageSize);
+    const offset = ((pageNo || 1) - 1) * (pageSize || params.get('limit') || 10);
+    params.set('offset', offset);
+    window.location.href = `/users?${params.toString()}`;
+}
+
+// 添加删除处理函数
+function handleDelete(id) {
+    const modal = bootstrap.Modal.getInstance(document.querySelector(`#deleteUserModal${id}`));
+    if (modal) {
+        modal.hide();
+    }
+    
+    UserApi.delete(id)
+        .then(() => FormValidator.handleSuccess('删除用户成功'))
+        .catch(error => FormValidator.handleError(error));
+}
+</script>
 {% endblock %}

@@ -45,16 +45,17 @@ FastAPI-Jinja2 是一个整合了多个流行技术栈的开源项目，旨在�
 ```sh
 fastapi_jinja2
 ├─ app
+│  ├─ alembic              # 数据库迁移目录
 │  ├─ core                 # 核心层模块
 │  ├─ model                # 数据层模块
 │  ├─ config               # 配置层模块
-│  ├─ view                 # 视图层模块
-│  └─ utils                # 工具类模块
+│  └─ view                 # 视图层模块
 ├─ logs                    # 日志目录
 ├─ static                  # 静态目录
 ├─ templates               # 模板目录
 ├─ .env                    # 项目环境配置文件
-├─ .gitignore.py           # git 忽略文件
+├─ .gitignore              # git 忽略文件
+├─ alembic.ini             # alembic 配置文件
 ├─ main.py                 # 项目启动文件
 ├─ requirements.txt        # 项目依赖文件
 ├─ sqlite.db               # 项目数据库文件
@@ -62,21 +63,22 @@ fastapi_jinja2
 ```
 
 ### 页面展示
+
 <table>
     <tr>
-        <td><img src="./static/img/login.jpeg"/>登陆</td>
-        <td><img src="./static/img/home.jpeg"/>首页</td>
+        <td><img src="./static/img/登录.png"/>登陆</td>
+        <td><img src="./static/img/首页.png"/>首页</td>
    </tr>
    <tr>
-        <td><img src="./static/img/users.jpeg"/>用户管理</td>
-        <td><img src="./static/img/create_user.jpeg"/>用户新增</td>
+        <td><img src="./static/img/用户页面.png"/>用户管理</td>
+        <td><img src="./static/img/新增页.png"/>用户新增</td>
    </tr>
    <tr>
-        <td><img src="./static/img/update_user.jpeg"/>用户编辑</td>
-        <td><img src="./static/img/delete_user.jpeg"/>用户删除</td>
+        <td><img src="./static/img/编辑页.png"/>用户编辑</td>
+        <td><img src="./static/img/删除页.png"/>用户删除</td>
    </tr>
    <tr>
-        <td><img src="./static/img/detail_user.jpeg"/>用户详情</td>
+        <td><img src="./static/img/详情.png"/>用户详情</td>
    </tr>
 </table>
 
@@ -122,6 +124,6 @@ fastapi_jinja2
 
 <table>
     <tr>
-        <td><img src="./static/img/wechat.png" height="300" /></td>
+        <td><img src="./static/img/微信.jpg" height="300" /></td>
     </tr>
 </table>
