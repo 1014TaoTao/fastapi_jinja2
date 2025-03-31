@@ -125,6 +125,8 @@ fastapi_jinja2
 
 <table>
     <tr>
-        <td><img src="./static/img/微信.jpg" height="300" /></td>
+      <td><img src="https://github.com/1014TaoTao/fastapi_vue3_admin/blob/master/mkdocs/docs/resources/images/微信.jpg"/></td>
+      <td><img src="https://github.com/1014TaoTao/fastapi_vue3_admin/blob/master/mkdocs/docs/resources/微信群"/></td>
+      <td><img src="https://github.com/1014TaoTao/fastapi_vue3_admin/blob/master/mkdocs/docs/resources/images/wechatPay.jpg"/></td>
     </tr>
 </table>
