@@ -7,7 +7,7 @@ from sqlmodel import Session, desc, func, select, asc, and_, or_
 
 from app.model.user import User, UserCreateSchema, UserUpdateSchema, Page, Response
 from app.core.database import get_db
-from app.core.logger import logger
+from app.core.log import logger
 
 templates = templating.Jinja2Templates(directory="templates")
 
@@ -63,6 +63,8 @@ async def list(
 
     # 获取总数
     total = db.exec(select(func.count()).select_from(sql)).first()
+    if total is None:
+        total = 0
 
     # 处理排序
     if order_by:

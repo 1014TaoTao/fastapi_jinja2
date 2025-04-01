@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from fastapi import FastAPI, Request, status, HTTPException, templating
+from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.responses import JSONResponse
-from app.core.logger import logger
+from app.core.log import logger
 
 def register_exception_handler(app: FastAPI) -> None:
 

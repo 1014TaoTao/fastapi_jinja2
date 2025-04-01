@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from starlette.responses import Response
-
-
 import time
 from fastapi import FastAPI, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
-from starlette.middleware.base import Response, BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.responses import Response
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.types import ASGIApp
 
-from app.core.logger import logger
+from app.core.log import logger
 
 
 class CustomCORSMiddleware(CORSMiddleware):
     """CORS跨域中间件"""
-    def __init__(self, app: FastAPI) -> None:
+    def __init__(self, app: ASGIApp) -> None:
         super().__init__(
             app,
             allow_origins=["*"],
@@ -28,7 +27,7 @@ class RequestLogMiddleware(BaseHTTPMiddleware):
     """
     记录请求日志中间件: 提供一个基础的中间件类，允许你自定义请求和响应处理逻辑。
     """
-    def __init__(self, app: FastAPI) -> None:
+    def __init__(self, app: ASGIApp) -> None:
         super().__init__(app)
 
     async def dispatch(
@@ -37,10 +36,9 @@ class RequestLogMiddleware(BaseHTTPMiddleware):
         start_time: float = time.time()
         
         logger.info(
-            f"请求来源: {request.client.host}, "
+            f"请求来源: {request.client.host if request.client else '未知'}, "
             f"请求方法: {request.method}, "
             f"请求路径: {request.url.path}, "
-            f"客户端IP: {request.client.host}"
         )
         
         try:

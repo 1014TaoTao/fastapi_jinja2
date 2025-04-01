@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     BASE_DIR: Path = Path(__file__).parent.parent.parent
 
     # sqlite 数据库名称
-    SQLITE_DB_NAME: str
+    SQLITE_DB_NAME: str = "app.db"
 
     @property
     def DATABASE_URL(self) -> str:

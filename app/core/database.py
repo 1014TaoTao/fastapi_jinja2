@@ -2,7 +2,7 @@
 
 from collections.abc import Generator
 from sqlmodel import create_engine, Session, select
-from app.core.logger import logger
+from app.core.log import logger
 
 from app.core.config import settings
 
