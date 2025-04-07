@@ -125,8 +125,8 @@ fastapi_jinja2
 
 <table>
     <tr>
-      <td><img src="https://github.com/1014TaoTao/fastapi_vue3_admin/blob/master/mkdocs/docs/resources/images/微信.jpg"/></td>
-      <td><img src="https://github.com/1014TaoTao/fastapi_vue3_admin/blob/master/mkdocs/docs/resources/images/微信群.jpg"/></td>
-      <td><img src="https://github.com/1014TaoTao/fastapi_vue3_admin/blob/master/mkdocs/docs/resources/images/wechatPay.jpg"/></td>
+      <td><img src="https://gitee.com/tao__tao/fastapi_vue3_admin/raw/master/mkdocs/docs/resources/images/微信.jpg"/></td>
+      <td><img src="https://gitee.com/tao__tao/fastapi_vue3_admin/raw/master/mkdocs/docs/resources/images/微信群.jpg"/></td>
+      <td><img src="https://gitee.com/tao__tao/fastapi_vue3_admin/raw/master/mkdocs/docs/resources/images/wechatPay.jpg"/></td>
     </tr>
 </table>
